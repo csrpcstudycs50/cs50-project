@@ -1,0 +1,22 @@
+**2D WORLD MEASURING**
+
+1-take a picture 90 degree angle of a surface 
+on the surface are objects to measure (widht and height only(2d))
+
+2-get the border of each object to single them out (like cs50 assignemnt)
+
+3-click one of the object if you know its dimensions input them
+or search for it online using google image search (or other programme) to get its dimensions
+now this object is the reference for all other objects
+
+4-input into the picture the dimension of every object
+
+PROBLEMS:
+-surface should be one color to avoid detecting none existing object using get borders functions
+
+LANGUAGES USED:
+1-C FOR BORDER DETECTION (maybe)
+2-PYTHON 
+3-SQLITE3
+4-HMTL/CSS
+5-JAVASCRIPT
