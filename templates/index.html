@@ -4,6 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
         <link href="static/style.css" rel="stylesheet">
         <script src="static/script.js" defer></script>
         <title>2D World Measurement</title>
@@ -11,10 +12,25 @@
     <body>
         <h1>2D World Measurement Tool</h1>
         <form action="/measure" method="post">
-            <img src="" id="imagePreview" alt="Image Preview" style="max-width: 100%; display: none;">
+            <input id="imagePicker" capture="environment" type="file" name="image" accept="image/*" required>
+            <canvas id="measurementCanvas"></canvas>
+            <div>    
+                <div id="calibrationContainer">
+                    <button type="button" id="calibrationButton" aria-pressed="false">Calibrate</button>
+                    <input type="number" id="calibrationValue" name="calibrationValue" placeholder="Line Length" required>
+                    <select id="calibrationUnit" name="calibrationUnit" required>
+                        <option value="mm">mm</option>
+                        <option value="cm">cm</option>
+                        <option value="m">m</option>
+                        <option value="in">in</option>
+                        <option value="ft">ft</option>
+                    </select>
+                </div>
+                <button type="button" id="measure">Measure</button>
+                <button type="button" id="reset">Reset</button>
+            </div>
             <div>
-                <input id="imageInput" type="file" name="image" accept="image/*" required>
-                <button type="submit">Measure</button>
+                <button type="submit">Save</button>
             </div>
         </form>
     </body>

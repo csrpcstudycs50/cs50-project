@@ -1,10 +1,55 @@
+/* Style the body to center the content and use a clean font */
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Style the heading to be centered and have some spacing */
 h1{
     text-align: center;
     margin-bottom: 20px;
 }
 
+/* Style the form to be centered and have a column layout */
 form {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
+
+/* Add some spacing between form elements */
+form > * {
+    margin-bottom: 10px;
+}
+
+/* Style the canvas to have a margin and be responsive */
+canvas {
+
+    margin: 20px;
+    max-width: 100%;
+    height: auto;
+}
+
+#calibrationContainer > * {
+  border-radius: 5px;
+  background-color: white;
+  color: black;
+}
+
+/* Hover state */
+#calibrationButton:hover {
+  background-color: grey;
+}
+
+/* Active / Checked State */
+#calibrationButton.active,
+#calibrationButton[aria-pressed="true"] {
+  background-color: green;
+  color: white;
+  border-color: white;
+}
+
