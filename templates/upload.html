@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card bg-body-secondary border p-4">
+            <h2 class="h4 fw-bold mb-3">Log New Measurement</h2>
+            
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                
+                <!-- Project Name -->
+                <div class="mb-3">
+                    <label for="project_name" class="form-label small fw-semibold">Project / Object Title</label>
+                    <input type="text" id="project_name" name="project_name" class="form-control" placeholder="e.g., Desk Monitor Bezel" required>
+                </div>
+
+                <!-- Image File Input -->
+                <div class="mb-3">
+                    <label for="image" class="form-label small fw-semibold">Photo</label>
+                    <input type="file" id="image" name="image" accept="image/*" class="form-control" required>
+                </div>
+
+                <!-- Reference Information -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="reference_object" class="form-label small fw-semibold">Reference Object Used</label>
+                        <input type="text" id="reference_object" name="reference_object" class="form-control" placeholder="e.g., Credit Card, Coin" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="reference_size" class="form-label small fw-semibold">Reference Known Size</label>
+                        <input type="text" id="reference_size" name="reference_size" class="form-control" placeholder="e.g., 85.6 mm" required>
+                    </div>
+                </div>
+
+                <!-- Measured Result -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-8">
+                        <label for="measured_value" class="form-label small fw-semibold">Measured Result</label>
+                        <input type="text" id="measured_value" name="measured_value" class="form-control" placeholder="e.g., 45.0" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="unit" class="form-label small fw-semibold">Unit</label>
+                        <select id="unit" name="unit" class="form-select">
+                            <option value="cm" selected>cm</option>
+                            <option value="mm">mm</option>
+                            <option value="in">in</option>
+                            <option value="ft">ft</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="/" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-info fw-bold">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
