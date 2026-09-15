@@ -48,8 +48,7 @@ def index():
 def upload():
     if request.method == 'POST':
         project_name = request.form.get('project_name')
-        reference_object = request.form.get('reference_object')
-        reference_size = request.form.get('reference_size')
+        instructions = request.form.get('instructions')
         measured_value = request.form.get('measured_value')
         unit = request.form.get('unit')
         file = request.files.get('image')
@@ -60,12 +59,12 @@ def upload():
             file.save(filepath)
 
             conn = get_db_connection()
-            conn.execute('''
-                INSERT INTO projects (project_name, image_filename, reference_object, reference_size, measured_value, unit)
-                VALUES (?, ?, ?, ?, ?, ?)
-            ''', (project_name, filename, reference_object, reference_size, measured_value, unit))
-            conn.commit()
-            conn.close()
+            # conn.execute('''
+            #     INSERT INTO projects (project_name, image_filename, reference_object, reference_size, measured_value, unit)
+            #     VALUES (?, ?, ?, ?, ?, ?)
+            # ''', (project_name, filename, reference_object, reference_size, measured_value, unit))
+            # conn.commit()
+            # conn.close()
 
             return redirect(url_for('index'))
 
