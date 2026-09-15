@@ -1,35 +1,9 @@
 {% extends "layout.html" %}
 
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h3 fw-bold mb-0">Measurement Log</h1>
-        <p class="text-body-secondary small mb-0">Saved spatial records and calibrated reference notes.</p>
-    </div>
-    <a href="/upload" class="btn btn-info fw-bold">+ New Log Entry</a>
-</div>
+{% block title %}
+    HOME
+{% endblock %}
 
-<div class="row row-cols-1 row-cols-md-3 g-4">
-    {% for project in projects %}
-    <div class="col">
-        <div class="card bg-body-secondary border h-100">
-            <img src="{{ url_for('static', filename='uploads/' + project.image_filename) }}" class="card-img-top object-fit-cover" height="200" alt="{{ project.project_name }}">
-            <div class="card-body">
-                <span class="badge bg-info text-dark float-end">{{ project.measured_value }} {{ project.unit }}</span>
-                <h5 class="card-title fw-bold mb-2">{{ project.project_name }}</h5>
-                <p class="card-text small text-body-secondary mb-1"><strong>Ref Object:</strong> {{ project.reference_object }}</p>
-                <p class="card-text small text-body-secondary mb-0"><strong>Ref Size:</strong> {{ project.reference_size }}</p>
-            </div>
-            <div class="card-footer bg-transparent border-top-0 text-end">
-                <span class="small text-body-tertiary">{{ project.created_at[:10] }}</span>
-            </div>
-        </div>
-    </div>
-    {% else %}
-    <div class="col-12 text-center py-5 border rounded bg-body-secondary">
-        <p class="text-body-secondary mb-2">No measurement records logged yet.</p>
-        <a href="/upload" class="btn btn-outline-info btn-sm">Add First Log</a>
-    </div>
-    {% endfor %}
-</div>
+{% block body %}
+    <h1>Welcome to the Home Page</h1>
 {% endblock %}
