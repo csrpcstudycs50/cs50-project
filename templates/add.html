@@ -1,0 +1,80 @@
+{% extends "layout.html" %}
+
+{%block title%}Add New{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Add New Item</h1>
+        <form method="post">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name" autofocus required>
+            </div>
+            <div class="form-group">
+                <label for="photo">Photo:</label>
+                <input type="file" class="form-control" id="photo" name="photo" required>
+            </div>
+            <!--All ingredients-->           
+            <div name="ingredient groups"></div>
+                <label for="ingredient groups">Ingredient(s):</label>
+                <!--one ingredient-->
+                <div name="ingredient group" class="input-group">
+                    <!--Name-->
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="floatingInput" name="ingredient" placeholder="eg.,flour" required>
+                        <label for="floatingInput">Name</label>                       
+                    </div>
+
+                    <!--Amount-->
+                    <div class="form-floating mb-3">
+                    <input type="number" class="form-control" id="floatingInput" setp="0.01" name="amount" placeholder="eg.,2." required>
+                        <label for="floatingInput">Amount</label>
+                    </div>
+
+                    <!--unit of measure-->
+                    <div class="form-floating">
+                        <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                            <!-- Weight / Mass -->
+                            <option value="g">g</option>
+                            <option value="kg">kg</option>
+                            <option value="mg">mg</option>
+                            <option value="oz">oz</option>
+                            <option value="lb">lb</option>
+
+                            <!-- Volume (Metric) -->
+                            <option value="ml">ml</option>
+                            <option value="l">l</option>
+
+                            <!-- Volume (US / Imperial Standard) -->
+                            <option value="tsp">tsp</option>
+                            <option value="tbsp">tbsp</option>
+                            <option value="fl oz">fl oz</option>
+                            <option value="cup">cup</option>
+                            <option value="pt">pt</option>
+
+                            <!-- Whole Units & Counts -->
+                            <option value="piece">piece</option>
+                            <option value="whole">whole</option>
+                            <option value="slice">slice</option>
+                            <option value="clove">clove</option>
+                            <option value="can">can</option>
+                            <option value="package">package</option>
+
+                            <!-- Culinary / Informal Measures -->
+                            <option value="pinch">pinch</option>
+                            <option value="dash">dash</option>
+                            <option value="handful">handful</option>
+                            <option value="bunch">bunch</option>
+                            <option value="drop">drop</option>
+                        </select>
+                        <label for="floatingSelect">unit of measure</label>
+                    </div>
+                </div>
+            <div class="input-group mb-3">
+                <button class="btn btn-secondary" type="button" id="addIngredient">+ ingredient</button>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Recipe</button>
+            <button type="reset" id="reset" class="btn btn-primary">Reset</button>
+        </form>
+    </div>
+{% endblock %}
