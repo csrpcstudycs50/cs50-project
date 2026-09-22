@@ -4,38 +4,42 @@
 
 {% block body %}
     <div class="container">
-        <h1>Add New Item</h1>
-        <form method="post">
+        <h1>Add New Recipe</h1>
+        <form method="post" action="/add" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="name">Name:</label>
-                <input type="text" class="form-control" id="name" name="name" autofocus required>
+                <input type="text" class="form-control" id="recipe_name" name="recipe_name" autofocus required>
             </div>
             <div class="form-group">
                 <label for="photo">Photo:</label>
-                <input type="file" class="form-control" id="photo" name="photo" required>
+                <input type="file" class="form-control" id="photo" name="recipe_photo">
             </div>
-            <!--All ingredients-->           
-            <div name="ingredient groups"></div>
-                <label for="ingredient groups">Ingredient(s):</label>
-                <!--one ingredient-->
+
+
+            <!--ALL INGREDIENTS-->
+            <label for="ingredient groups">Ingredient(s):</label>           
+            <div name="ingredient groups" id="ingredients">
+
+                <!--FIRST ingredient-->
                 <div name="ingredient group" class="input-group">
+                    
                     <!--Name-->
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInput" name="ingredient" placeholder="eg.,flour" required>
+                        <input type="text" class="form-control" id="floatingInput" name="ingredient_name" placeholder="eg.,flour" required>
                         <label for="floatingInput">Name</label>                       
                     </div>
 
                     <!--Amount-->
                     <div class="form-floating mb-3">
-                    <input type="number" class="form-control" id="floatingInput" setp="0.01" name="amount" placeholder="eg.,2." required>
+                    <input type="number" class="form-control" id="floatingInput" setp="0.01" name="ingredient_amount" placeholder="eg.,2." required>
                         <label for="floatingInput">Amount</label>
                     </div>
 
                     <!--unit of measure-->
                     <div class="form-floating">
-                        <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                        <select class="form-select" name="unit" id="floatingSelect" aria-label="Floating label select example">
                             <!-- Weight / Mass -->
-                            <option value="g">g</option>
+                            <option value="g" SELECTED>g</option>
                             <option value="kg">kg</option>
                             <option value="mg">mg</option>
                             <option value="oz">oz</option>
@@ -69,12 +73,27 @@
                         </select>
                         <label for="floatingSelect">unit of measure</label>
                     </div>
+
+                    <!--REMOVE button-->                    
+                    <button class="btn btn-outline-danger input-group-text red mb-3" name="remove_ingredient" type="button">X</button>
+                    
                 </div>
+                <!--SECOND ingredient-->
+
+            </div>
+            
+            <!--ADD ingredient input Button-->
             <div class="input-group mb-3">
                 <button class="btn btn-secondary" type="button" id="addIngredient">+ ingredient</button>
             </div>
+            <label for="instructions">Instructions:</label>
+            <div id="instructions" class="input-group mb-3">        
+                <textarea type="text" name="instructions" rows="3"></textarea>
+            </div>
+
+            <!-- submit and reset -->
             <button type="submit" class="btn btn-primary">Add Recipe</button>
-            <button type="reset" id="reset" class="btn btn-primary">Reset</button>
+            <button type="reset"  class="btn btn-primary red">Reset</button>
         </form>
     </div>
 {% endblock %}
