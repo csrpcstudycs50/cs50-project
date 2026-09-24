@@ -1,9 +1,70 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    HOME
+    Home - Recipe Box
 {% endblock %}
 
 {% block body %}
-    <h1>Welcome to the Home Page</h1>
+    <h1 class="mb-4">My Recipes</h1>
+
+    <div class="row">
+        {% for recipe in recipes %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm" id="recipe-card-{{ recipe.id }}">
+                    
+                    <!-- 1. DISPLAY VIEW -->
+                    <div class="card-body card-display d-flex flex-column">
+                        <h5 class="card-title fw-bold mb-3">{{ recipe.name }}</h5>
+                        
+                        {% if recipe.photo and recipe.photo != 'default_picture' %}
+                            <img src="{{ url_for('static', filename='uploads/' ~ recipe.photo) }}" 
+                                 class="img-fluid rounded mb-3" 
+                                 alt="{{ recipe.name }}"
+                                 style="max-height: 200px; object-fit: cover; width: 100%;">
+                        {% endif %}
+                        
+                        <h6 class="fw-bold">Ingredients:</h6>
+                        <ul class="mb-3 ps-3">
+                            {% for item in recipe.ingredients %}
+                                <li>{{ item.amount }} {{ item.unit }} – {{ item.name }}</li>
+                            {% endfor %}
+                        </ul>
+                        
+                        {% if recipe.instructions %}
+                            <h6 class="fw-bold">Instructions:</h6>
+                            <p class="card-text text-muted mb-4" style="white-space: pre-line;">{{ recipe.instructions }}</p>
+                        {% endif %}
+
+                        <!-- Action Buttons -->
+                        <div class="mt-auto d-flex gap-2 pt-3 border-top">
+                            <button class="btn btn-outline-primary edit-btn w-50" type="button">Edit</button>
+                            
+                            <form action="/delete/{{ recipe.id }}" method="POST" class="w-50" onsubmit="return confirm('Are you sure you want to delete {{ recipe.name }}?');">
+                                <button type="submit" class="btn btn-outline-danger w-100">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 2. INLINE EDIT FORM VIEW (Hidden by default) -->
+                    <div class="card-body card-edit d-none">
+                        <h5 class="mb-3 text-primary">Editing: {{ recipe.name }}</h5>
+                        
+                        <!-- Pass action URL and button text to form.html -->
+                        {% set action_url = "/edit/" ~ recipe.id %}
+                        {% set submit_button_text = "Save Changes" %}
+                        {% include "form.html" %}
+                        
+                        <button class="btn btn-outline-secondary cancel-btn mt-2 w-100" type="button">Cancel</button>
+                    </div>
+
+                </div>
+            </div>
+        {% else %}
+            <!-- Empty State when no recipes exist in database -->
+            <div class="col-12 text-center py-5">
+                <p class="fs-4 text-muted">No recipes added yet!</p>
+                <a href="/add" class="btn btn-primary btn-lg">+ Add Your First Recipe</a>
+            </div>
+        {% endfor %} 
+    </div>
 {% endblock %}

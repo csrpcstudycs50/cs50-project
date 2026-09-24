@@ -1,0 +1,144 @@
+<!-- templates/form.html -->
+<form method="post" action="{{ action_url }}" enctype="multipart/form-data">
+    
+    <!-- Recipe Name -->
+    <div class="form-group mb-3">
+        <label for="recipe_name_{{ recipe.id if recipe else 'new' }}">Name:</label>
+        <input type="text" class="form-control" 
+               id="recipe_name_{{ recipe.id if recipe else 'new' }}" 
+               name="recipe_name" 
+               value="{{ recipe.name if recipe else '' }}" 
+               {% if not recipe %}autofocus{% endif %} required>
+    </div>
+
+    <!-- Recipe Photo -->
+    <div class="form-group mb-3">
+        <label for="photo_{{ recipe.id if recipe else 'new' }}">Photo:</label>
+        <input type="file" class="form-control" id="photo_{{ recipe.id if recipe else 'new' }}" name="recipe_photo">
+        {% if recipe and recipe.photo and recipe.photo != 'default_picture' %}
+            <small class="text-muted d-block mt-1">Current photo: {{ recipe.photo }}</small>
+        {% endif %}
+    </div>
+
+    <!-- Ingredients Section -->
+    <label class="form-label fw-bold">Ingredient(s):</label>           
+    <div id="ingredients{% if recipe %}-{{ recipe.id }}{% endif %}" class="ingredients-container mb-3">
+
+        {% if recipe and recipe.ingredients %}
+            <!-- EDIT MODE: Render existing ingredients -->
+            {% for item in recipe.ingredients %}
+            {% set row_id = recipe.id ~ '-' ~ loop.index %}
+            <div class="input-group mb-2 ingredient-row">
+                
+                <!-- Name -->
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="ing_name_{{ row_id }}" name="ingredient_name" 
+                           placeholder="e.g., flour" value="{{ item.name }}" required>
+                    <label for="ing_name_{{ row_id }}">Name</label>                       
+                </div>
+
+                <!-- Amount -->
+                <div class="form-floating">
+                    <input type="number" class="form-control" id="ing_amount_{{ row_id }}" step="any" name="ingredient_amount" 
+                           placeholder="e.g., 2" value="{{ item.amount }}" required>
+                    <label for="ing_amount_{{ row_id }}">Amount</label>
+                </div>
+
+                <!-- Unit of Measure -->
+                <div class="form-floating">
+                    <select class="form-select" id="ing_unit_{{ row_id }}" name="unit" aria-label="Unit of measure">
+                        {% set units = [
+                            'g', 'kg', 'mg', 'oz', 'lb',
+                            'ml', 'l',
+                            'tsp', 'tbsp', 'fl oz', 'cup', 'pt',
+                            'piece', 'whole', 'slice', 'clove', 'can', 'package',
+                            'pinch', 'dash', 'handful', 'bunch', 'drop'
+                        ] %}
+                        {% for u in units %}
+                            <option value="{{ u }}" {% if item.unit == u %}selected{% endif %}>{{ u }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="ing_unit_{{ row_id }}">Unit</label>
+                </div>
+
+                <!-- REMOVE button -->                    
+                <button class="btn btn-outline-danger input-group-text remove-ingredient-btn" type="button">X</button>
+            </div>
+            {% endfor %}
+
+        {% else %}
+            <!-- ADD MODE: Default single empty ingredient row -->
+            <div class="input-group mb-2 ingredient-row">
+                
+                <!-- Name -->
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="ing_name_new_1" name="ingredient_name" placeholder="e.g., flour" required>
+                    <label for="ing_name_new_1">Name</label>                       
+                </div>
+
+                <!-- Amount -->
+                <div class="form-floating">
+                    <input type="number" class="form-control" id="ing_amount_new_1" step="any" name="ingredient_amount" placeholder="e.g., 2" required>
+                    <label for="ing_amount_new_1">Amount</label>
+                </div>
+
+                <!-- Unit of Measure -->
+                <div class="form-floating">
+                    <select class="form-select" id="ing_unit_new_1" name="unit" aria-label="Unit of measure">
+                        <option value="g" selected>g</option>
+                        <option value="kg">kg</option>
+                        <option value="mg">mg</option>
+                        <option value="oz">oz</option>
+                        <option value="lb">lb</option>
+
+                        <option value="ml">ml</option>
+                        <option value="l">l</option>
+
+                        <option value="tsp">tsp</option>
+                        <option value="tbsp">tbsp</option>
+                        <option value="fl oz">fl oz</option>
+                        <option value="cup">cup</option>
+                        <option value="pt">pt</option>
+
+                        <option value="piece">piece</option>
+                        <option value="whole">whole</option>
+                        <option value="slice">slice</option>
+                        <option value="clove">clove</option>
+                        <option value="can">can</option>
+                        <option value="package">package</option>
+
+                        <option value="pinch">pinch</option>
+                        <option value="dash">dash</option>
+                        <option value="handful">handful</option>
+                        <option value="bunch">bunch</option>
+                        <option value="drop">drop</option>
+                    </select>
+                    <label for="ing_unit_new_1">Unit</label>
+                </div>
+
+                <!-- REMOVE button -->                    
+                <button class="btn btn-outline-danger input-group-text remove-ingredient-btn" type="button">X</button>
+            </div>
+        {% endif %}
+
+    </div>
+    
+    <!-- ADD ingredient button -->
+    <div class="mb-3">
+        <button class="btn btn-secondary add-ingredient-edit-btn" type="button" {% if not recipe %}id="addIngredient"{% endif %}>+ ingredient</button>
+    </div>
+
+    <!-- Instructions -->
+    <div class="form-group mb-3">
+        <label for="instructions_{{ recipe.id if recipe else 'new' }}">Instructions:</label>
+        <textarea class="form-control" id="instructions_{{ recipe.id if recipe else 'new' }}" name="instructions" rows="3">{{ recipe.instructions if recipe else '' }}</textarea>
+    </div>
+
+    <!-- Submit & Reset -->
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">{{ submit_button_text | default('Submit') }}</button>
+        {% if not recipe %}
+            <button type="reset" class="btn btn-secondary">Reset</button>
+        {% endif %}
+    </div>
+</form>

@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from flask import Flask, request, render_template, g
+from flask import Flask, request, render_template, g, redirect
 
 app = Flask(__name__)
 
@@ -70,9 +70,41 @@ if not os.path.exists(DATABASE):
 # ==========================================
 
 @app.route('/')
-def index():
-    """Renders the main dashboard page."""
-    return render_template('index.html')
+@app.route('/index')
+def load():
+    """Load and display all saved recipes with their associated ingredients."""
+    db = get_db()
+
+    # 1. Fetch all recipes ordered by newest first
+    recipes_rows = db.execute("SELECT * FROM recipes ORDER BY id DESC").fetchall()
+
+    recipes = []
+    
+    # 2. For each recipe, fetch its linked ingredients, amounts, and units
+    for recipe in recipes_rows:
+        recipe_id = recipe["id"]
+        
+        ingredients_rows = db.execute("""
+            SELECT 
+                i.name, 
+                ri.ingredient_amount AS amount, 
+                ri.unit 
+            FROM recipes_ingredients ri
+            JOIN ingredients i ON ri.ingredient_id = i.id
+            WHERE ri.recipe_id = ?
+        """, (recipe_id,)).fetchall()
+
+        # Build a structured dictionary for each recipe
+        recipes.append({
+            "id": recipe["id"],
+            "name": recipe["name"],
+            "photo": recipe["photo"],
+            "instructions": recipe["instructions"],
+            "ingredients": ingredients_rows
+        })
+
+    # 3. Pass the structured list to index.html
+    return render_template('index.html', recipes=recipes)
 
 
 @app.route('/add', methods=['GET', 'POST'])
@@ -80,8 +112,7 @@ def add():
     """
     Handles recipe creation:
     - GET: Displays the recipe creation form.
-    - POST: Validates input fields, uploads optional media, populates database tables
-            (recipes, ingredients, and join table recipes_ingredients), and commits changes.
+    - POST: Validates input fields, uploads optional media, populates database tables, and commits changes.
     """
     if request.method == 'POST':
         # 1. Validate required core recipe metadata
@@ -121,29 +152,20 @@ def add():
         instructions = request.form.get("instructions")
         db = get_db()
         
-        # 5. Insert primary recipe entry
-        db.execute(
-            "INSERT OR IGNORE INTO recipes (name, photo, instructions) VALUES (?, ?, ?)",
+        # 5. Insert primary recipe entry and capture its auto-incremented primary key
+        cursor = db.execute(
+            "INSERT INTO recipes (name, photo, instructions) VALUES (?, ?, ?)",
             (recipe_name, filename, instructions)
         )
+        recipe_id = cursor.lastrowid
         
-        # 6. Insert new unique ingredients (skips existing entries via UNIQUE index)
+        # 6. Insert new unique ingredients into master catalog
         for name in ingredients_names:
             db.execute("INSERT OR IGNORE INTO ingredients (name) VALUES (?)", (name,))
 
-        # 7. Fetch foreign key ID for the created recipe
-        cursor = db.execute("SELECT id FROM recipes WHERE name = ?", (recipe_name,))
-        row = cursor.fetchone()
-        if row:
-            recipe_id = row["id"]
-        else:
-            print("Database Error: Could not recover inserted recipe ID")
-            return render_template("add.html")
-        
-        # 8. Map recipe and ingredients together in join table with amounts and units
+        # 7. Map recipe and ingredients together in join table with amounts and units
         for ing_name, ing_amount, ing_uom in zip(ingredients_names, ingredients_amounts, ingredients_UOM):
-            cursor = db.execute("SELECT id FROM ingredients WHERE name = ?", (ing_name,))
-            row = cursor.fetchone()
+            row = db.execute("SELECT id FROM ingredients WHERE name = ?", (ing_name,)).fetchone()
             if row:
                 ingredient_id = row["id"]
                 db.execute(
@@ -154,17 +176,82 @@ def add():
                 print(f"Database Error: Could not resolve ID for ingredient '{ing_name}'")
                 return render_template("add.html")
             
-        # 9. Atomic commit for all database writes
+        # 8. Atomic commit for all database writes
         db.commit()
-        return render_template("index.html")
+        return redirect('/')
         
     return render_template('add.html')
 
 
-@app.route('/index')
-def load():
-    """Placeholder route for secondary data loading."""
-    pass
+@app.route('/edit/<int:recipe_id>', methods=['POST'])
+def edit(recipe_id):
+    """Updates an existing recipe and its ingredients in the database."""
+    db = get_db()
+
+    # 1. Fetch form inputs
+    recipe_name = request.form.get("recipe_name")
+    instructions = request.form.get("instructions")
+    
+    if not recipe_name:
+        return redirect('/')
+
+    # 2. Check if a new photo was uploaded; otherwise keep existing photo
+    file = request.files.get("recipe_photo")
+    if file and file.filename != '':
+        filename = file.filename
+        file.save(os.path.join(UPLOAD_FOLDER, filename))
+        db.execute("UPDATE recipes SET photo = ? WHERE id = ?", (filename, recipe_id))
+
+    # 3. Update main recipe fields
+    db.execute(
+        "UPDATE recipes SET name = ?, instructions = ? WHERE id = ?",
+        (recipe_name, instructions, recipe_id)
+    )
+
+    # 4. Refresh ingredients: Clear old join-table relationships for this recipe
+    db.execute("DELETE FROM recipes_ingredients WHERE recipe_id = ?", (recipe_id,))
+
+    # 5. Extract updated ingredient lists
+    ingredients_names = request.form.getlist("ingredient_name")
+    ingredients_amounts = request.form.getlist("ingredient_amount")
+    ingredients_UOM = request.form.getlist("unit")
+
+    # 6. Insert missing ingredients and re-link in recipes_ingredients
+    for name, amount, uom in zip(ingredients_names, ingredients_amounts, ingredients_UOM):
+        if name and amount and uom:
+            # Ensure ingredient exists in catalog
+            db.execute("INSERT OR IGNORE INTO ingredients (name) VALUES (?)", (name,))
+            
+            # Fetch ingredient ID
+            row = db.execute("SELECT id FROM ingredients WHERE name = ?", (name,)).fetchone()
+            if row:
+                ingredient_id = row["id"]
+                db.execute(
+                    "INSERT INTO recipes_ingredients (recipe_id, ingredient_id, ingredient_amount, unit) VALUES (?, ?, ?, ?)",
+                    (recipe_id, ingredient_id, amount, uom)
+                )
+
+    db.commit()
+    return redirect('/')
+
+
+@app.route('/delete/<int:recipe_id>', methods=['POST'])
+def delete(recipe_id):
+    """Deletes a recipe and its image file, returning to the main dashboard."""
+    db = get_db()
+    
+    # 1. Clean up local image file if custom photo was uploaded
+    recipe = db.execute("SELECT photo FROM recipes WHERE id = ?", (recipe_id,)).fetchone()
+    if recipe and recipe["photo"] and recipe["photo"] != "default_picture":
+        photo_path = os.path.join(UPLOAD_FOLDER, recipe["photo"])
+        if os.path.exists(photo_path):
+            os.remove(photo_path)
+
+    # 2. Remove recipe from database (CASCADE deletes linked recipes_ingredients)
+    db.execute("DELETE FROM recipes WHERE id = ?", (recipe_id,))
+    db.commit()
+
+    return redirect('/')
 
 
 if __name__ == '__main__':

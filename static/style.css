@@ -1,8 +1,25 @@
-h1{
+/* Center all top-level headings */
+h1 {
     text-align: center;
 }
-.red{
-    background-color: red;
-    color:white;
+
+/* Custom Red Utility (softer shade matching Bootstrap danger style) */
+.red {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: #ffffff !important;
 }
 
+.red:hover {
+    background-color: #bb2d3b !important;
+    border-color: #b02a37 !important;
+    color: #ffffff !important;
+}
+
+/* Recipe image sizing in cards */
+.card-img-top,
+.card-display img {
+    object-fit: cover;
+    border-top-left-radius: calc(0.375rem - 1px);
+    border-top-right-radius: calc(0.375rem - 1px);
+}
